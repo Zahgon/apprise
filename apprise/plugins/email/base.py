@@ -801,18 +801,7 @@ class NotifyEmail(NotifyBase):
         another similar one. Targets or end points should never be identified
         here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.user,
-            self.password,
-            self.host,
-            self.smtp_host,
-            (
-                self.port
-                if self.port
-                else SECURE_MODES[self.secure_mode]["default_port"]
-            ),
-        )
+        pass
 
     def __len__(self):
         """
@@ -1200,4 +1189,4 @@ class NotifyEmail(NotifyBase):
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("pgpy",)
+        pass

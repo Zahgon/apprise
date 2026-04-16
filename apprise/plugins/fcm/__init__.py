@@ -326,31 +326,7 @@ class NotifyFCM(NotifyBase):
     @property
     def access_token(self):
         """Generates a access_token based on the keyfile provided."""
-        keyfile = self.keyfile[0]
-        if not keyfile:
-            # We could not access the keyfile
-            self.logger.error(
-                f"Could not access FCM keyfile {keyfile.url(privacy=True)}."
-            )
-            return None
-
-        if not self.oauth.load(keyfile.path):
-            self.logger.error(
-                f"FCM keyfile {keyfile.url(privacy=True)} could not be loaded."
-            )
-            return None
-
-        # Verify our project id against the one provided in our keyfile
-        if self.project != self.oauth.project_id:
-            self.logger.error(
-                f"FCM keyfile {keyfile.url(privacy=True)} identifies itself"
-                " for a different project"
-            )
-            return None
-
-        # Return our generated key; the below returns None if a token could
-        # not be acquired
-        return self.oauth.access_token
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Perform FCM Notification."""
@@ -535,7 +511,7 @@ class NotifyFCM(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.mode, self.apikey, self.project)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -654,4 +630,4 @@ class NotifyFCM(NotifyBase):
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("cryptography",)
+        pass

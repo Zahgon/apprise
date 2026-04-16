@@ -676,132 +676,11 @@ class NotifyLametric(NotifyBase):
 
     def _cloud_notification_payload(self, body, notify_type, headers):
         """Return URL and payload for cloud directed requests."""
-
-        # Update header entries
-        headers.update(
-            {
-                "X-Access-Token": self.lametric_apikey,
-            }
-        )
-
-        if self.sound:
-            self.logger.warning(
-                "LaMetric sound setting is unavailable in Cloud mode"
-            )
-
-        if self.priority != self.template_args["priority"]["default"]:
-            self.logger.warning(
-                "LaMetric priority setting is unavailable in Cloud mode"
-            )
-
-        if self.icon_type != self.template_args["icon_type"]["default"]:
-            self.logger.warning(
-                "LaMetric icon_type setting is unavailable in Cloud mode"
-            )
-
-        if self.cycles != self.template_args["cycles"]["default"]:
-            self.logger.warning(
-                "LaMetric cycle settings is unavailable in Cloud mode"
-            )
-
-        # Assign our icon if the user specified a custom one, otherwise
-        # choose from our pre-set list (based on notify_type)
-        icon = (
-            self.icon
-            if self.icon
-            else self.lametric_icon_id_mapping[notify_type]
-        )
-
-        # Our Payload
-        # Cloud Notifications don't have as much functionality
-        # You can not set priority and/or sound
-        payload = {
-            "frames": [
-                {
-                    "icon": icon,
-                    "text": body,
-                    "index": 0,
-                }
-            ]
-        }
-
-        # Prepare our Cloud Notify URL
-        notify_url = self.cloud_notify_url.format(
-            app_id=self.lametric_app_id, app_ver=self.lametric_app_ver
-        )
-
-        # Return request parameters
-        return (notify_url, None, payload)
+        pass
 
     def _device_notification_payload(self, body, notify_type, headers):
         """Return URL and Payload for Device directed requests."""
-
-        # Assign our icon if the user specified a custom one, otherwise
-        # choose from our pre-set list (based on notify_type)
-        icon = (
-            self.icon
-            if self.icon
-            else self.lametric_icon_id_mapping[notify_type]
-        )
-
-        # Our Payload
-        payload = {
-            # Priority of the message
-            "priority": self.priority,
-            # Icon Type: Represents the nature of notification
-            "icon_type": self.icon_type,
-            # The time notification lives in queue to be displayed in
-            # milliseconds (ms). The default lifetime is 2 minutes (120000ms).
-            # If notification stayed in queue for longer than lifetime
-            # milliseconds - it will not be displayed.
-            "lifetime": 120000,
-            "model": {
-                # cycles - the number of times message should be displayed. If
-                # cycles is set to 0, notification will stay on the screen
-                # until user dismisses it manually. By default it is set to 1.
-                "cycles": self.cycles,
-                "frames": [
-                    {
-                        "icon": icon,
-                        "text": body,
-                    }
-                ],
-            },
-        }
-
-        if self.sound:
-            # Sound was set, so add it to the payload
-            payload["model"]["sound"] = {
-                # The sound category
-                "category": self.sound[0],
-                # The first element of our tuple is always the id
-                "id": self.sound[1][0],
-                # repeat - defines the number of times sound must be played.
-                # If set to 0 sound will be played until notification is
-                # dismissed. By default the value is set to 1.
-                "repeat": 1,
-            }
-
-        if not self.user:
-            # Use default user if there wasn't one otherwise specified
-            self.user = self.default_device_user
-
-        # Prepare our authentication
-        auth = (self.user, self.password)
-
-        # Prepare our Direct Access Notify URL
-        notify_url = self.device_notify_url.format(
-            schema="https" if self.secure else "http",
-            host=self.host,
-            port=":{}".format(
-                self.port
-                if self.port
-                else self.template_tokens["port"]["default"]
-            ),
-        )
-
-        # Return request parameters
-        return (notify_url, auth, payload)
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Perform LaMetric Notification."""
@@ -891,29 +770,7 @@ class NotifyLametric(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        if self.mode == LametricMode.DEVICE:
-            return (
-                self.secure_protocol if self.secure else self.protocol,
-                self.user,
-                self.lametric_apikey,
-                self.host,
-                (
-                    self.port
-                    if self.port
-                    else (
-                        443
-                        if self.secure
-                        else self.template_tokens["port"]["default"]
-                    )
-                ),
-            )
-
-        return (
-            self.protocol,
-            self.lametric_app_access_token,
-            self.lametric_app_id,
-            self.lametric_app_ver,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

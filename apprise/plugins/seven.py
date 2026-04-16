@@ -169,7 +169,7 @@ class NotifySeven(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.apikey)
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Perform seven Notification."""

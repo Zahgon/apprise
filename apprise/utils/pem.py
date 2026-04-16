@@ -717,89 +717,7 @@ class ApprisePEMController:
 
         Payload is the base64-encoded JSON from encrypt().
         """
-
-        if not PEM_SUPPORT:
-            msg = "PEM Support unavailable; install cryptography library"
-            logger.warning(msg)
-            raise ApprisePEMException(msg)
-
-        # 1. Parse input
-        try:
-            if isinstance(encrypted_payload, str):
-                payload_bytes = base64.b64decode(
-                    encrypted_payload.encode("utf-8")
-                )
-
-            else:
-                payload_bytes = base64.b64decode(encrypted_payload)
-
-        except binascii.Error:
-            # Bad Padding
-            logger.debug("Unparseable encrypted content provided")
-            return None
-
-        try:
-            payload = json.loads(payload_bytes.decode("utf-8"))
-
-        except UnicodeDecodeError:
-            logger.debug("Unparseable encrypted content provided")
-            return None
-
-        ephemeral_pubkey_bytes = base64_urldecode(payload["ephemeral_pubkey"])
-        iv = base64_urldecode(payload["iv"])
-        tag = base64_urldecode(payload["tag"])
-        ciphertext = base64_urldecode(payload["ciphertext"])
-
-        # 2. Select private key
-        if private_key is None:
-            private_key = self.private_key()
-            if private_key is None:
-                logger.debug("No private key available for decryption.")
-                return None
-
-        # 3. Load ephemeral public key from sender
-        ephemeral_pubkey = ec.EllipticCurvePublicKey.from_encoded_point(
-            ec.SECP256R1(), ephemeral_pubkey_bytes
-        )
-
-        # 4. ECDH shared secret
-        shared_secret = private_key.exchange(ec.ECDH(), ephemeral_pubkey)
-
-        # 5. Derive symmetric AES key with HKDF
-        derived_key = HKDF(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            info=b"ecies-encryption",
-            backend=default_backend(),
-        ).derive(shared_secret)
-
-        # 6. Decrypt using AES-GCM
-        decryptor = Cipher(
-            algorithms.AES(derived_key),
-            modes.GCM(iv, tag),
-            backend=default_backend(),
-        ).decryptor()
-
-        try:
-            plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-
-        except InvalidTag:
-            logger.debug("Decryption failed - Authentication Mismatch")
-            # Reason for Error:
-            #   - Mismatched or missing salt
-            #   - Mismatched iv, tag, or ciphertext
-            #   - Incorrect or corrupted ephemeral_pubkey
-            #   - Wrong or incomplete key derivation
-            #   - Data being altered between encryption and decryption
-            #     (truncated/corrupted)
-
-            # Basically if we get here, we tried to decrypt encrypted content
-            # using the wrong key.
-            return None
-
-        # 7. Return decoded message
-        return plaintext.decode("utf-8")
+        pass
 
     def sign(self, content: bytes) -> Optional[bytes]:
         """Sign the message using ES256 (ECDSA w/ SHA256) via private key."""
@@ -825,44 +743,19 @@ class ApprisePEMController:
         """Returns the Public Keyfile Path if set otherwise it returns None
         This property returns False if a keyfile was provided, but was
         invalid."""
-        return (
-            None
-            if not self._pub_keyfile
-            else (
-                False
-                if not self._pub_keyfile[0]
-                else self._pub_keyfile[0].path
-            )
-        )
+        pass
 
     @property
     def prv_keyfile(self) -> Optional[Union[str, bool]]:
         """Returns the Private Keyfile Path if set otherwise it returns None
         This property returns False if a keyfile was provided, but was
         invalid."""
-        return (
-            None
-            if not self._prv_keyfile
-            else (
-                False
-                if not self._prv_keyfile[0]
-                else self._prv_keyfile[0].path
-            )
-        )
+        pass
 
     @property
     def x962_str(self) -> str:
         """X962 serialization based on public key."""
-        try:
-            return base64_urlencode(
-                self.public_key().public_bytes(
-                    encoding=serialization.Encoding.X962,
-                    format=serialization.PublicFormat.UncompressedPoint,
-                )
-            )
-        except AttributeError:
-            # Public Key could not be generated (public_key() returned None)
-            return ""
+        pass
 
     def __bool__(self) -> bool:
         """Returns True if at least 1 key was loaded."""

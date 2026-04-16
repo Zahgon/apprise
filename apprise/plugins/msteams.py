@@ -534,13 +534,7 @@ class NotifyMSTeams(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.team if self.version > 1 else None,
-            self.token_a,
-            self.token_b,
-            self.token_c,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

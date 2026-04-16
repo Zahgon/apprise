@@ -393,12 +393,7 @@ class NotifyIRC(NotifyBase):
         self,
     ) -> tuple[str, Optional[str], Optional[str], Optional[str]]:
         """Return the pieces that uniquely identify this configuration."""
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.host,
-            self.user,
-            self.password,
-        )
+        pass
 
     def url(self, privacy: bool = False, *args: Any, **kwargs: Any) -> str:
         """Return the URL representation of this notification."""

@@ -295,14 +295,7 @@ class NotifyXMPP(NotifyBase):
     @property
     def url_identifier(self) -> tuple[str, str, str, str, Optional[int]]:
         """Return the pieces that uniquely identify this configuration."""
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.host,
-            self.xmpp_host,
-            self.user,
-            self.password,
-            self.port,
-        )
+        pass
 
     def url(self, privacy: bool = False, *args: Any, **kwargs: Any) -> str:
         """Return the URL representation of this notification."""
@@ -431,8 +424,7 @@ class NotifyXMPP(NotifyBase):
         Depending on if the subject field is set, we can control
         how the message is constructed.
         """
-
-        return 0 if not self.subject else super().title_maxlen
+        pass
 
     @staticmethod
     def normalize_jid(value: str, default_host: str) -> tuple[str, bool]:
@@ -509,4 +501,4 @@ class NotifyXMPP(NotifyBase):
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("slixmpp",)
+        pass

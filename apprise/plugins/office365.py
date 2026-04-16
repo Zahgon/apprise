@@ -957,13 +957,7 @@ class NotifyOffice365(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol[0],
-            self.source,
-            self.tenant,
-            self.client_id,
-            self.secret,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

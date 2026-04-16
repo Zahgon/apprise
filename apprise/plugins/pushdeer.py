@@ -187,12 +187,7 @@ class NotifyPushDeer(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.push_key,
-            self.host,
-            self.port,
-        )
+        pass
 
     def url(self, privacy=False):
         """Returns the URL built dynamically based on specified arguments."""

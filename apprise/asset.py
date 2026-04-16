@@ -450,15 +450,7 @@ class AppriseAsset:
 
     def details(self) -> dict[str, str]:
         """Returns the details associated with the AppriseAsset object."""
-        return {
-            "app_id": self.app_id,
-            "app_desc": self.app_desc,
-            "default_extension": self.default_extension,
-            "theme": self.theme,
-            "image_path_mask": self.image_path_mask,
-            "image_url_mask": self.image_url_mask,
-            "image_url_logo": self.image_url_logo,
-        }
+        pass
 
     @staticmethod
     def hex_to_rgb(value: str) -> tuple[int, int, int]:
@@ -485,29 +477,27 @@ class AppriseAsset:
     @property
     def plugin_paths(self) -> list[str]:
         """Return the plugin paths defined."""
-        return self.__plugin_paths
+        pass
 
     @property
     def storage_path(self) -> Optional[str]:
         """Return the persistent storage path defined."""
-        return self.__storage_path
+        pass
 
     @property
     def storage_mode(self) -> PersistentStoreMode:
         """Return the persistent storage mode defined."""
-
-        return self.__storage_mode
+        pass
 
     @property
     def storage_salt(self) -> bytes:
         """Return the provided namespace salt; this is always of type bytes."""
-        return self.__storage_salt
+        pass
 
     @property
     def storage_idlen(self) -> int:
         """Return the persistent storage id length."""
-
-        return self.__storage_idlen
+        pass
 
     @property
     def tzinfo(self) -> tzinfo:

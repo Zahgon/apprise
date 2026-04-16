@@ -37,20 +37,4 @@ class AppriseJSONEncoder(json.JSONEncoder):
     """A JSON Encoder for handling Apprise internals."""
 
     def default(self, entry):
-        if isinstance(entry, datetime):
-            return entry.strftime(
-                AWARE_DATE_ISO_FORMAT
-                if entry.tzinfo is not None
-                else NAIVE_DATE_ISO_FORMAT
-            )
-
-        elif isinstance(entry, bytes):
-            return base64.b64encode(entry).decode("utf-8")
-
-        elif isinstance(entry, (set, frozenset, tuple)):
-            return list(entry)
-
-        elif isinstance(entry, LazyTranslation):
-            return str(entry)
-
-        return super().default(entry)
+        pass

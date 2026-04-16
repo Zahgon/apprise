@@ -262,54 +262,7 @@ class AppriseConfig:
         set to True then all plugins that are set to a STRICT mode will be a
         treated as ALWAYS.
         """
-
-        # Initialize our default recursion value
-        recursion = recursion if recursion is not None else self.recursion
-
-        # Initialize our default insecure_includes value
-        insecure_includes = (
-            insecure_includes
-            if insecure_includes is not None
-            else self.insecure_includes
-        )
-
-        if asset is None:
-            # prepare default asset
-            asset = self.asset
-
-        if not isinstance(content, str):
-            logger.warning(
-                f"An invalid configuration (type={type(content)}) was"
-                " specified."
-            )
-            return False
-
-        logger.debug(f"Loading raw configuration: {content}")
-
-        # Create ourselves a ConfigMemory Object to store our configuration
-        instance = C_MGR["memory"](
-            content=content,
-            format=format,
-            asset=asset,
-            tag=tag,
-            recursion=recursion,
-            insecure_includes=insecure_includes,
-        )
-
-        if not (
-            instance.config_format
-            and instance.config_format.value in common.CONFIG_FORMATS
-        ):
-            logger.warning(
-                "The format of the configuration could not be detected."
-            )
-            return False
-
-        # Add our initialized plugin to our server listings
-        self.configs.append(instance)
-
-        # Return our status
-        return True
+        pass
 
     def servers(
         self,
@@ -456,30 +409,7 @@ class AppriseConfig:
 
     def server_pop(self, index: int) -> NotifyBase:
         """Removes an indexed Apprise Notification from the servers."""
-
-        # Tracking variables
-        prev_offset = -1
-        offset = prev_offset
-
-        for entry in self.configs:
-            servers = entry.servers(cache=True)
-            if len(servers) > 0:
-                # Acquire a new maximum offset to work with
-                offset = prev_offset + len(servers)
-
-                if offset >= index:
-                    # we can pop an notification from our config stack
-                    return entry.pop(
-                        index
-                        if prev_offset == -1
-                        else (index - prev_offset - 1)
-                    )
-
-                # Update our old offset
-                prev_offset = offset
-
-        # If we reach here, then we indexed out of range
-        raise IndexError("list index out of range")
+        pass
 
     def pop(self, index: int = -1) -> ConfigBase:
         """Removes an indexed Apprise Configuration from the stack and returns

@@ -314,11 +314,7 @@ class NotifyBlink1(NotifyBase):
     @property
     def url_identifier(self):
         """Returns all fields that uniquely identify this connection."""
-        return (
-            self.protocol,
-            self.serial,
-            self.ledn,
-        )
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Perform blink(1) Notification."""
@@ -393,4 +389,4 @@ class NotifyBlink1(NotifyBase):
     @staticmethod
     def runtime_deps():
         """Return optional runtime dependency package names."""
-        return ("hid",)
+        pass

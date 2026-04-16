@@ -733,34 +733,7 @@ class NotifyNtfy(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-
-        kwargs = [
-            (
-                self.secure_protocol
-                if self.mode == NtfyMode.CLOUD
-                else (self.secure_protocol if self.secure else self.protocol)
-            ),
-            self.host if self.mode == NtfyMode.PRIVATE else "",
-            (
-                443
-                if self.mode == NtfyMode.CLOUD
-                else (self.port if self.port else (443 if self.secure else 80))
-            ),
-        ]
-
-        if self.mode == NtfyMode.PRIVATE:
-            if self.auth == NtfyAuth.BASIC:
-                kwargs.extend(
-                    [
-                        self.user if self.user else None,
-                        self.password if self.password else None,
-                    ]
-                )
-
-            elif self.token:  # NtfyAuth.TOKEN also
-                kwargs.append(self.token)
-
-        return kwargs
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

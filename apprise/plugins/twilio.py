@@ -509,11 +509,7 @@ class NotifyTwilio(NotifyBase):
     def body_maxlen(self):
         """The maximum allowable characters allowed in the body per message.
         It is dependent on the notification method."""
-        return (
-            self.body_sms_maxlen
-            if self.method == TwilioNotificationMethod.SMS
-            else self.body_call_maxlen
-        )
+        pass
 
     @property
     def url_identifier(self):
@@ -522,12 +518,7 @@ class NotifyTwilio(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.account_sid,
-            self.auth_token,
-            self.source,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

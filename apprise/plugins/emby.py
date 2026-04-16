@@ -608,13 +608,7 @@ class NotifyEmby(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.user,
-            self.password,
-            self.host,
-            self.port if self.port else (443 if self.secure else 80),
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -657,25 +651,13 @@ class NotifyEmby(NotifyBase):
     @property
     def is_authenticated(self):
         """Returns True if we're authenticated and False if not."""
-        return bool(self.access_token and self.user_id)
+        pass
 
     @property
     def emby_auth_header(self):
         """Generates the X-Emby-Authorization header response based on whether
         we're authenticated or not."""
-        # Specific to Emby
-        header_args = [
-            ("MediaBrowser Client", self.app_id),
-            ("Device", self.app_id),
-            ("DeviceId", self.emby_device_id),
-            ("Version", str(VERSION)),
-        ]
-
-        if self.user_id:
-            # Append UserId variable if we're authenticated
-            header_args.append(("UserId", self.user))
-
-        return ", ".join([f'{k}="{v}"' for k, v in header_args])
+        pass
 
     @staticmethod
     def parse_url(url):

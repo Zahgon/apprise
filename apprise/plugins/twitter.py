@@ -407,114 +407,7 @@ class NotifyTwitter(NotifyBase):
         **kwargs,
     ):
         """Twitter Public Tweet."""
-
-        # Error Tracking
-        has_error = False
-
-        payload = {
-            "status": body,
-        }
-
-        payloads = []
-        if not attachments:
-            payloads.append(payload)
-
-        else:
-            # Group our images if batch is set to do so
-            batch_size = (
-                1 if not self.batch else self.__tweet_non_gif_images_batch
-            )
-
-            # Track our batch control in our message generation
-            batches = []
-            batch = []
-            for attachment in attachments:
-                batch.append(str(attachment["media_id"]))
-
-                # Twitter supports batching images together.  This allows
-                # the batching of multiple images together.  Twitter also
-                # makes it clear that you can't batch `gif` files; they need
-                # to be separate.  So the below preserves the ordering that
-                # a user passed their attachments in.  if 4-non-gif images
-                # are passed, they are all part of a single message.
-                #
-                # however, if they pass in image, gif, image, gif.  The
-                # gif's inbetween break apart the batches so this would
-                # produce 4 separate tweets.
-                #
-                # If you passed in, image, image, gif, image. <- This would
-                # produce 3 images (as the first 2 images could be lumped
-                # together as a batch)
-                if (
-                    not re.match(
-                        r"^image/(png|jpe?g)", attachment["file_mime"], re.I
-                    )
-                    or len(batch) >= batch_size
-                ):
-                    batches.append(",".join(batch))
-                    batch = []
-
-            if batch:
-                batches.append(",".join(batch))
-
-            for no, media_ids in enumerate(batches):
-                payload_ = deepcopy(payload)
-                payload_["media_ids"] = media_ids
-
-                if no or not body:
-                    # strip text and replace it with the image representation
-                    payload_["status"] = f"{no + 1:02d}/{len(batches):02d}"
-                payloads.append(payload_)
-
-        for no, payload in enumerate(payloads, start=1):
-            # Send Tweet
-            postokay, response = self._fetch(
-                self.twitter_tweet,
-                payload=payload,
-                json=False,
-            )
-
-            if not postokay:
-                # Track our error
-                has_error = True
-
-                errors = []
-                with contextlib.suppress(KeyError, TypeError):
-                    errors = [
-                        "Error Code {}: {}".format(
-                            e.get("code", "unk"), e.get("message")
-                        )
-                        for e in response["errors"]
-                    ]
-
-                for error in errors:
-                    self.logger.debug(
-                        "Tweet [%.2d/%.2d] Details: %s",
-                        no,
-                        len(payloads),
-                        error,
-                    )
-                continue
-
-            try:
-                url = "https://twitter.com/{}/status/{}".format(
-                    response["user"]["screen_name"], response["id_str"]
-                )
-
-            except (KeyError, TypeError):
-                url = "unknown"
-
-            self.logger.debug(
-                "Tweet [%.2d/%.2d] Details: %s", no, len(payloads), url
-            )
-
-            self.logger.info(
-                "Sent [%.2d/%.2d] Twitter notification as public tweet.",
-                no,
-                len(payloads),
-            )
-
-        return not has_error
+        pass
 
     def _send_dm(
         self,
@@ -525,82 +418,7 @@ class NotifyTwitter(NotifyBase):
         **kwargs,
     ):
         """Twitter Direct Message."""
-
-        # Error Tracking
-        has_error = False
-
-        payload = {
-            "event": {
-                "type": "message_create",
-                "message_create": {
-                    "target": {
-                        # This gets assigned
-                        "recipient_id": None,
-                    },
-                    "message_data": {
-                        "text": body,
-                    },
-                },
-            }
-        }
-
-        # Lookup our users (otherwise we look up ourselves)
-        targets = (
-            self._whoami(lazy=self.cache)
-            if not len(self.targets)
-            else self._user_lookup(self.targets, lazy=self.cache)
-        )
-
-        if not targets:
-            # We failed to lookup any users
-            self.logger.warning(
-                "Failed to acquire user(s) to Direct Message via Twitter"
-            )
-            return False
-
-        payloads = []
-        if not attachments:
-            payloads.append(payload)
-
-        else:
-            for no, attachment in enumerate(attachments):
-                payload_ = deepcopy(payload)
-                data = payload_["event"]["message_create"]["message_data"]
-                data["attachment"] = {
-                    "type": "media",
-                    "media": {"id": attachment["media_id"]},
-                    "additional_owners": ",".join(
-                        [str(x) for x in targets.values()]
-                    ),
-                }
-                if no or not body:
-                    # strip text and replace it with the image representation
-                    data["text"] = f"{no + 1:02d}/{len(attachments):02d}"
-                payloads.append(payload_)
-
-        for no, payload in enumerate(payloads, start=1):
-            for screen_name, user_id in targets.items():
-                # Assign our user
-                target = payload["event"]["message_create"]["target"]
-                target["recipient_id"] = user_id
-
-                # Send Twitter DM
-                postokay, _response = self._fetch(
-                    self.twitter_dm,
-                    payload=payload,
-                )
-
-                if not postokay:
-                    # Track our error
-                    has_error = True
-                    continue
-
-                self.logger.info(
-                    f"Sent [{no:02d}/{len(payloads):02d}] "
-                    f"Twitter DM notification to @{screen_name}."
-                )
-
-        return not has_error
+        pass
 
     def _whoami(self, lazy=True):
         """Looks details of current authenticated user."""
@@ -638,52 +456,7 @@ class NotifyTwitter(NotifyBase):
 
         the screen_name can be a list/set/tuple as well
         """
-
-        # Contains a mapping of screen_name to id
-        results = {}
-
-        # Build a unique set of names
-        names = parse_list(screen_name)
-
-        if lazy and self._user_cache:
-            # Use cached response
-            results = {k: v for k, v in self._user_cache.items() if k in names}
-
-            # limit our names if they already exist in our cache
-            names = [name for name in names if name not in results]
-
-        if not len(names):
-            # They're is nothing further to do
-            return results
-
-        # Twitters API documents that it can lookup to 100
-        # results at a time.
-        # https://developer.twitter.com/en/docs/accounts-and-users/\
-        #     follow-search-get-users/api-reference/get-users-lookup
-        for i in range(0, len(names), 100):
-            # Look up our names by their screen_name
-            postokay, response = self._fetch(
-                self.twitter_lookup,
-                payload={
-                    "screen_name": names[i : i + 100],
-                },
-                json=False,
-            )
-
-            if not postokay or not isinstance(response, list):
-                # Track our error
-                continue
-
-            # Update our user index
-            for entry in response:
-                with contextlib.suppress(TypeError, KeyError):
-                    results[entry["screen_name"]] = entry["id"]
-
-        # Cache our response for future use; this saves on un-nessisary extra
-        # hits against the Twitter API when we already know the answer
-        self._user_cache.update(results)
-
-        return results
+        pass
 
     def _fetch(self, url, payload=None, method="POST", json=True):
         """Wrapper to Twitter API requests object."""
@@ -839,7 +612,7 @@ class NotifyTwitter(NotifyBase):
         """The maximum allowable characters allowed in the body per message
         This is used during a Private DM Message Size (not Public Tweets which
         are limited to 280 characters)"""
-        return 10000 if self.mode == TwitterMessageMode.DM else 280
+        pass
 
     @property
     def url_identifier(self):
@@ -848,13 +621,7 @@ class NotifyTwitter(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol[0],
-            self.ckey,
-            self.csecret,
-            self.akey,
-            self.asecret,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

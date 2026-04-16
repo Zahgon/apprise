@@ -1163,13 +1163,7 @@ class NotifySlack(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.token_a,
-            self.token_b,
-            self.token_c,
-            self.access_token,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

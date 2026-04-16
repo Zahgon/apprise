@@ -279,15 +279,7 @@ class NotifyNotica(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.mode,
-            self.token,
-            self.user,
-            self.password,
-            self.host,
-            self.port,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

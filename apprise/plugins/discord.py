@@ -695,7 +695,7 @@ class NotifyDiscord(NotifyBase):
     @property
     def url_identifier(self) -> tuple[str, str, str]:
         """Returns all of the identifiers that make this URL unique."""
-        return (self.secure_protocol, self.webhook_id, self.webhook_token)
+        pass
 
     @staticmethod
     def parse_url(url: str) -> dict[str, Any] | None:

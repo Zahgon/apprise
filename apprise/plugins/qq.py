@@ -102,7 +102,7 @@ class NotifyQQ(NotifyBase):
     @property
     def url_identifier(self):
         """Returns a unique identifier for this plugin instance."""
-        return (self.secure_protocol, self.token)
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Send a QQ Push Notification."""

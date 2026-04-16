@@ -388,118 +388,7 @@ class URLBase:
              json://abc/def/ghi?image=no
              json://abc/def/ghi/?test=yes&image=yes
         """
-
-        if lazy and self.__cached_url_identifier is not False:
-            return (
-                self.__cached_url_identifier
-                if not (
-                    self.__cached_url_identifier and self.asset.storage_idlen
-                )
-                else self.__cached_url_identifier[: self.asset.storage_idlen]
-            )
-
-        # Python v3.9 introduces usedforsecurity argument
-        kwargs = (
-            {"usedforsecurity": False} if sys.version_info >= (3, 9) else {}
-        )
-
-        if self.url_identifier is False:
-            # Disabled
-            self.__cached_url_identifier = None
-
-        elif self.url_identifier in (None, True):
-            # Prepare our object
-            engine = hash_engine(
-                self.asset.storage_salt
-                + self.schema.encode(self.asset.encoding),
-                **kwargs,
-            )
-
-            # We want to treat `None` differently then a blank entry
-            engine.update(
-                b"\0"
-                if self.password is None
-                else self.password.encode(self.asset.encoding)
-            )
-            engine.update(
-                b"\0"
-                if self.user is None
-                else self.user.encode(self.asset.encoding)
-            )
-            engine.update(
-                b"\0"
-                if not self.host
-                else self.host.encode(self.asset.encoding)
-            )
-            engine.update(
-                b"\0"
-                if self.port is None
-                else f"{self.port}".encode(self.asset.encoding)
-            )
-            engine.update(
-                self.fullpath.rstrip("/").encode(self.asset.encoding)
-            )
-            engine.update(b"s" if self.secure else b"i")
-
-            # Save our generated content
-            self.__cached_url_identifier = engine.hexdigest()
-
-        elif isinstance(self.url_identifier, str):
-            self.__cached_url_identifier = hash_engine(
-                self.asset.storage_salt
-                + self.url_identifier.encode(self.asset.encoding),
-                **kwargs,
-            ).hexdigest()
-
-        elif isinstance(self.url_identifier, bytes):
-            self.__cached_url_identifier = hash_engine(
-                self.asset.storage_salt + self.url_identifier, **kwargs
-            ).hexdigest()
-
-        elif isinstance(self.url_identifier, (list, tuple, set)):
-            self.__cached_url_identifier = hash_engine(
-                self.asset.storage_salt
-                + b"".join(
-                    [
-                        (
-                            x
-                            if isinstance(x, bytes)
-                            else str(x).encode(self.asset.encoding)
-                        )
-                        for x in self.url_identifier
-                    ]
-                ),
-                **kwargs,
-            ).hexdigest()
-
-        elif isinstance(self.url_identifier, dict):
-            self.__cached_url_identifier = hash_engine(
-                self.asset.storage_salt
-                + b"".join(
-                    [
-                        (
-                            x
-                            if isinstance(x, bytes)
-                            else str(x).encode(self.asset.encoding)
-                        )
-                        for x in self.url_identifier.values()
-                    ]
-                ),
-                **kwargs,
-            ).hexdigest()
-
-        else:
-            self.__cached_url_identifier = hash_engine(
-                self.asset.storage_salt
-                + str(self.url_identifier).encode(self.asset.encoding),
-                **kwargs,
-            ).hexdigest()
-
-        return (
-            self.__cached_url_identifier
-            if not (self.__cached_url_identifier and self.asset.storage_idlen)
-            else self.__cached_url_identifier[: self.asset.storage_idlen]
-        )
+        pass
 
     def __contains__(self, tags):
         """Returns true if the tag specified is associated with this
@@ -760,44 +649,32 @@ class URLBase:
 
     @property
     def app_id(self):
-        return self.asset.app_id if self.asset.app_id else ""
+        pass
 
     @property
     def app_desc(self):
-        return self.asset.app_desc if self.asset.app_desc else ""
+        pass
 
     @property
     def app_url(self):
-        return self.asset.app_url if self.asset.app_url else ""
+        pass
 
     @property
     def request_timeout(self):
         """This is primarily used to fullfill the `timeout` keyword argument
         that is used by requests.get() and requests.put() calls."""
-        return (self.socket_connect_timeout, self.socket_read_timeout)
+        pass
 
     @property
     def request_auth(self):
         """This is primarily used to fullfill the `auth` keyword argument that
         is used by requests.get() and requests.put() calls."""
-        return (self.user, self.password) if self.user else None
+        pass
 
     @property
     def request_url(self):
         """Assemble a simple URL that can be used by the requests library."""
-
-        # Acquire our schema
-        schema = "https" if self.secure else "http"
-
-        # Prepare our URL
-        url = f"{schema}://{self.host}"
-
-        # Apply Port information if present
-        if isinstance(self.port, int):
-            url += f":{self.port}"
-
-        # Append our full path
-        return url + self.fullpath
+        pass
 
     def url_parameters(self, *args, **kwargs):
         """Provides a default set of args to work with. This can greatly

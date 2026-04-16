@@ -489,23 +489,7 @@ class NotifyMQTT(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.user,
-            self.password,
-            self.host,
-            (
-                self.port
-                if self.port
-                else (
-                    self.mqtt_secure_port
-                    if self.secure
-                    else self.mqtt_insecure_port
-                )
-            ),
-            self.fullpath.rstrip("/"),
-            self.client_id,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -624,37 +608,11 @@ class NotifyMQTT(NotifyBase):
         Taken from https://golang.org/src/crypto/x509/root_linux.go
         TODO: Maybe refactor to a general utility function?
         """
-        candidates = [
-            # Debian/Ubuntu/Gentoo etc.
-            "/etc/ssl/certs/ca-certificates.crt",
-            # Fedora/RHEL 6
-            "/etc/pki/tls/certs/ca-bundle.crt",
-            # OpenSUSE
-            "/etc/ssl/ca-bundle.pem",
-            # OpenELEC
-            "/etc/pki/tls/cacert.pem",
-            # CentOS/RHEL 7
-            "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
-            # macOS Homebrew; brew install ca-certificates
-            "/usr/local/etc/ca-certificates/cert.pem",
-        ]
-
-        # Certifi provides Mozilla's carefully curated collection of Root
-        # Certificates for validating the trustworthiness of SSL certificates
-        # while verifying the identity of TLS hosts. It has been extracted from
-        # the Requests project.
-        try:
-            import certifi
-
-            candidates.append(certifi.where())
-        except ImportError:  # pragma: no cover
-            pass
-
-        return candidates
+        pass
 
     @staticmethod
     def runtime_deps():
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("paho",)
+        pass

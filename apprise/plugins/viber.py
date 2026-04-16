@@ -184,7 +184,7 @@ class NotifyViber(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.token)
+        pass
 
     def send(
         self,

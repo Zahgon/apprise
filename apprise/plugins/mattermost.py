@@ -705,15 +705,7 @@ class NotifyMattermost(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.mode,
-            self.token,
-            self.host,
-            self.port,
-            self.fullpath,
-            self.user if self.mode == MattermostMode.BOT else None,
-        )
+        pass
 
     def url(self, privacy: bool = False, *args: Any, **kwargs: Any) -> str:
         """Returns the URL built dynamically based on specified arguments."""

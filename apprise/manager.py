@@ -745,49 +745,7 @@ class PluginManager(metaclass=Singleton):
 
     def enable_only(self, *schemas):
         """Disables the modules associated with the specified schemas."""
-        if not self:
-            # Lazy load
-            self.load_modules()
-
-        # convert to set for faster indexing
-        schemas = set(schemas)
-
-        for plugin in self.plugins():
-            # Get our plugin's schema list
-            p_schemas = set(
-                parse_list(plugin.secure_protocol, plugin.protocol)
-            )
-
-            if not schemas & p_schemas:
-                if plugin.enabled:
-                    # Disable it (only if previously enabled); this prevents us
-                    # from adjusting schemas that were disabled due to missing
-                    # libraries or other environment reasons
-                    plugin.disable()
-                    self._disabled |= p_schemas
-                    logger.debug(
-                        "Disabled %s plugin (%s)",
-                        self.name,
-                        ", ".join(f"{s}://" for s in p_schemas),
-                    )
-
-                    # Decrement dep counters; evict at zero if evict_on_disable
-                    self._update_dep_counter(plugin, -1)
-                continue
-
-            # If we reach here, our schema was flagged to be enabled
-            if p_schemas & self._disabled:
-                # Previously disabled; no worries, let's clear this up
-                self._disabled -= p_schemas
-                plugin.enable()
-                logger.debug(
-                    "Enabled %s plugin (%s)",
-                    self.name,
-                    ", ".join(f"{s}://" for s in p_schemas),
-                )
-
-                # Increment dep counters for the re-enabled plugin
-                self._update_dep_counter(plugin, +1)
+        pass
 
     def __contains__(self, schema):
         """Checks if a schema exists."""

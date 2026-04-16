@@ -471,7 +471,7 @@ class NotifyVapid(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.mode, self.subscriber)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -587,28 +587,7 @@ class NotifyVapid(NotifyBase):
     @property
     def jwt_token(self):
         """Returns our VAPID Token based on class details."""
-        # JWT header
-        header = {"alg": "ES256", "typ": "JWT"}
-
-        # JWT payload
-        payload = {
-            "aud": VAPID_API_LOOKUP[self.mode],
-            "exp": int(time.time()) + self.vapid_jwt_expiration_sec,
-            "sub": f"mailto:{self.subscriber}",
-        }
-
-        # Base64 URL encode header and payload
-        header_b64 = base64_urlencode(
-            dumps(header, separators=(",", ":")).encode("utf-8")
-        )
-        payload_b64 = base64_urlencode(
-            dumps(payload, separators=(",", ":")).encode("utf-8")
-        )
-        signing_input = f"{header_b64}.{payload_b64}".encode()
-        signature_b64 = base64_urlencode(self.pem.sign(signing_input))
-
-        # Return final token
-        return f"{header_b64}.{payload_b64}.{signature_b64}"
+        pass
 
     @property
     def public_key(self):
@@ -620,4 +599,4 @@ class NotifyVapid(NotifyBase):
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("cryptography",)
+        pass

@@ -55,26 +55,17 @@ def convert_between(from_format, to_format, content):
 
 def markdown_to_html(content):
     """Converts specified content from markdown to HTML."""
-    return markdown(
-        content,
-        extensions=["markdown.extensions.nl2br", "markdown.extensions.tables"],
-    )
+    pass
 
 
 def text_to_html(content):
     """Converts specified content from plain text to HTML."""
-
-    # First eliminate any carriage returns
-    return URLBase.escape_html(content, convert_new_lines=True)
+    pass
 
 
 def html_to_text(content):
     """Converts a content from HTML to plain text."""
-
-    parser = HTMLConverter()
-    parser.feed(content)
-    parser.close()
-    return parser.converted
+    pass
 
 
 class HTMLConverter(HTMLParser):
@@ -173,39 +164,12 @@ class HTMLConverter(HTMLParser):
 
     def handle_data(self, data, *args, **kwargs):
         """Store our data if it is not on the ignore list."""
-
-        # initialize our previous flag
-        if self._do_store:
-            # Tidy our whitespace
-            content = self.WS_TRIM.sub(" ", data)
-            self._result.append(content)
+        pass
 
     def handle_starttag(self, tag, attrs):
         """Process our starting HTML Tag."""
-        # Toggle initial states
-        self._do_store = tag not in self.IGNORE_TAGS
-
-        if tag in self.BLOCK_TAGS:
-            self._result.append(self.BLOCK_END)
-
-        if tag == "li":
-            self._result.append("- ")
-
-        elif tag == "br":
-            self._result.append("\n")
-
-        elif tag == "hr":
-            if self._result and isinstance(self._result[-1], str):
-                self._result[-1] = self._result[-1].rstrip(" ")
-
-            self._result.append("\n---\n")
-
-        elif tag == "blockquote":
-            self._result.append(" >")
+        pass
 
     def handle_endtag(self, tag):
         """Edge case handling of open/close tags."""
-        self._do_store = True
-
-        if tag in self.BLOCK_TAGS:
-            self._result.append(self.BLOCK_END)
+        pass

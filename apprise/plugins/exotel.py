@@ -533,14 +533,7 @@ class NotifyExotel(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.apikey,
-            self.sid,
-            self.token,
-            self.source,
-            self.region_name,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """

@@ -331,18 +331,7 @@ class NotifyRocketChat(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.host,
-            self.port if self.port else (443 if self.secure else 80),
-            self.user,
-            (
-                self.password
-                if self.mode
-                in (RocketChatAuthMode.BASIC, RocketChatAuthMode.TOKEN)
-                else self.webhook
-            ),
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -428,106 +417,18 @@ class NotifyRocketChat(NotifyBase):
         self, body, title="", notify_type=NotifyType.INFO, **kwargs
     ):
         """Sends a webhook notification."""
-
-        # Our payload object
-        payload = self._payload(body, title, notify_type)
-
-        # Assemble our webhook URL
-        path = f"hooks/{self.webhook}"
-
-        # Build our list of channels/rooms/users (if any identified)
-        targets = [f"@{u}" for u in self.users]
-        targets.extend([f"#{c}" for c in self.channels])
-        targets.extend([f"{r}" for r in self.rooms])
-
-        if len(targets) == 0:
-            # We can take an early exit
-            return self._send(
-                payload, notify_type=notify_type, path=path, **kwargs
-            )
-
-        # Otherwise we want to iterate over each of the targets
-
-        # Initiaize our error tracking
-        has_error = False
-
-        while len(targets):
-            # Retrieve our target
-            target = targets.pop(0)
-
-            # Assign our channel/room/user
-            payload["channel"] = target
-
-            if not self._send(
-                payload, notify_type=notify_type, path=path, **kwargs
-            ):
-                # toggle flag
-                has_error = True
-
-        return not has_error
+        pass
 
     def _send_basic_notification(
         self, body, title="", notify_type=NotifyType.INFO, **kwargs
     ):
         """Authenticates with the server using a user/pass combo for
         notifications."""
-        # Track whether we authenticated okay
-
-        if self.mode == RocketChatAuthMode.BASIC and not self.login():
-            return False
-
-        # prepare JSON Object
-        payload_ = self._payload(body, title, notify_type)
-
-        # Initiaize our error tracking
-        has_error = False
-
-        # Build our list of channels/rooms/users (if any identified)
-        channels = [f"@{u}" for u in self.users]
-        channels.extend([f"#{c}" for c in self.channels])
-
-        # Create a copy of our channels to notify against
-        payload = payload_.copy()
-        while len(channels) > 0:
-            # Get Channel
-            channel = channels.pop(0)
-            payload["channel"] = channel
-
-            if not self._send(payload, notify_type=notify_type, **kwargs):
-                # toggle flag
-                has_error = True
-
-        # Create a copy of our room id's to notify against
-        rooms = list(self.rooms)
-        payload = payload_.copy()
-        while len(rooms):
-            # Get Room
-            room = rooms.pop(0)
-            payload["roomId"] = room
-
-            if not self._send(payload, notify_type=notify_type, **kwargs):
-                # toggle flag
-                has_error = True
-
-        if self.mode == RocketChatAuthMode.BASIC:
-            # logout
-            self.logout()
-
-        return not has_error
+        pass
 
     def _payload(self, body, title="", notify_type=NotifyType.INFO):
         """Prepares a payload object."""
-        # prepare JSON Object
-        payload = {
-            "text": body,
-        }
-
-        # apply our images if they're set to be displayed
-        image_url = self.image_url(notify_type)
-        if self.avatar and image_url:
-            payload["avatar"] = image_url
-
-        return payload
+        pass
 
     def _send(
         self, payload, notify_type, path="api/v1/chat.postMessage", **kwargs

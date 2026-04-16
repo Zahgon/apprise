@@ -856,23 +856,7 @@ class NotifyFluxer(NotifyBase):
     @property
     def url_identifier(self) -> tuple[Any, ...]:
         """Returns all of the identifiers that make this URL unique."""
-        kwargs = (
-            (
-                self.secure_protocol
-                if self.mode == FluxerMode.CLOUD
-                else (self.secure_protocol if self.secure else self.protocol)
-            ),
-            self.host if self.mode == FluxerMode.PRIVATE else "",
-            (
-                ""
-                if self.mode == FluxerMode.CLOUD
-                else (self.port if self.port else (443 if self.secure else 80))
-            ),
-            self.webhook_id,
-            self.webhook_token,
-        )
-
-        return kwargs
+        pass
 
     @staticmethod
     def parse_url(url: str) -> dict[str, Any] | None:

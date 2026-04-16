@@ -133,11 +133,11 @@ class SocketTransport:
 
     @property
     def connected(self) -> bool:
-        return self._sock is not None
+        pass
 
     @property
     def is_tls(self) -> bool:
-        return self._is_tls
+        pass
 
     def close(self) -> None:
         """Close the socket and associated file wrappers."""

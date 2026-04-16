@@ -150,19 +150,19 @@ class WebPushSubscription:
 
     @property
     def auth(self) -> Optional[str]:
-        return self.__auth if self.__public_key else None
+        pass
 
     @property
     def endpoint(self) -> Optional[str]:
-        return self.__endpoint if self.__public_key else None
+        pass
 
     @property
     def p256dh(self) -> Optional[str]:
-        return self.__p256dh if self.__public_key else None
+        pass
 
     @property
     def auth_secret(self) -> Optional[bytes]:
-        return self.__auth_secret if self.__public_key else None
+        pass
 
     @property
     def public_key(self) -> Optional["ec.EllipticCurvePublicKey"]:
@@ -170,27 +170,11 @@ class WebPushSubscription:
 
     @property
     def dict(self) -> dict:
-        return (
-            {
-                "endpoint": self.__endpoint,
-                "keys": {
-                    "p256dh": self.__p256dh,
-                    "auth": self.__auth,
-                },
-            }
-            if self.__public_key
-            else {
-                "endpoint": "https://fcm.googleapis.com/fcm/send/abc123...",
-                "keys": {
-                    "p256dh": "<place public key in base64 here>",
-                    "auth": "<place auth in base64 here>",
-                },
-            }
-        )
+        pass
 
     def json(self, indent: int = 2) -> str:
         """Returns JSON representation of the object."""
-        return json.dumps(self.dict, indent=indent)
+        pass
 
     def __bool__(self) -> bool:
         """Handle 'if' statement."""
@@ -306,11 +290,7 @@ class WebPushSubscriptionManager:
     @property
     def dict(self) -> dict:
         """Returns a dictionary of all entries."""
-        return (
-            {k: v.dict for k, v in self.__subscriptions.items()}
-            if self.__subscriptions
-            else {}
-        )
+        pass
 
     def load(self, path: str, byte_limit=0) -> bool:
         """Writes content to disk based on path specified.  Content is a JSON
@@ -410,4 +390,4 @@ class WebPushSubscriptionManager:
 
     def json(self, indent: int = 2) -> str:
         """Returns JSON representation of the object."""
-        return json.dumps(self.dict, indent=indent)
+        pass

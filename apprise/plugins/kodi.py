@@ -316,27 +316,7 @@ class NotifyXBMC(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        default_schema = (
-            self.xbmc_protocol
-            if (self.protocol <= self.xbmc_remote_protocol)
-            else self.kodi_protocol
-        )
-        if self.secure:
-            # Append 's' to schema
-            default_schema += "s"
-
-        port = (
-            self.port
-            if self.port
-            else (443 if self.secure else self.xbmc_default_port)
-        )
-        return (
-            default_schema,
-            self.user,
-            self.password,
-            self.host,
-            port,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

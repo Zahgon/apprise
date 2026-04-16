@@ -196,34 +196,12 @@ class AttachBase(URLBase):
         If this is not known or is know but has been considered expired (due to
         cache setting), then content is re-retrieved prior to returning.
         """
-
-        if not self.exists():
-            # we could not obtain our path
-            return None
-
-        return self.download_path
+        pass
 
     @property
     def name(self):
         """Returns the filename."""
-        if self._name:
-            # return our fixed content
-            return self._name
-
-        if not self.exists():
-            # we could not obtain our name
-            return None
-
-        if not self.detected_name:
-            # If we get here, our download was successful but we don't have a
-            # filename based on our content.
-            ext = mimetypes.guess_extension(self.mimetype)
-            self.detected_name = (
-                f"{self.unknown_filename}"
-                f"{ext if ext else self.unknown_filename_extension}"
-            )
-
-        return self.detected_name
+        pass
 
     @property
     def mimetype(self):
@@ -231,31 +209,7 @@ class AttachBase(URLBase):
 
         Content is cached once determied to prevent overhead of future calls.
         """
-        if not self.exists():
-            # we could not obtain our attachment
-            return None
-
-        if self._mimetype:
-            # return our pre-calculated cached content
-            return self._mimetype
-
-        if not self.detected_mimetype:
-            # guess_type() returns: (type, encoding) and sets type to None
-            # if it can't otherwise determine it.
-            with contextlib.suppress(TypeError):
-                # Directly reference _name and detected_name to prevent
-                # recursion loop (as self.name calls this function)
-                self.detected_mimetype, _ = mimetypes.guess_type(
-                    self._name if self._name else self.detected_name,
-                    strict=self.strict,
-                )
-
-        # Return our mime type
-        return (
-            self.detected_mimetype
-            if self.detected_mimetype
-            else self.unknown_mimetype
-        )
+        pass
 
     def exists(self, retrieve_if_missing=True):
         """Simply returns true if the object has downloaded and stored the
@@ -367,9 +321,7 @@ class AttachBase(URLBase):
 
     def open(self, mode="rb"):
         """Return our file pointer and track it (we'll auto close later)"""
-        pointer = open(self.path, mode=mode)  # noqa: SIM115
-        self.__pointers.add(pointer)
-        return pointer
+        pass
 
     def chunk(self, size=5242880):
         """A Generator that yield chunks of a file with the specified size.

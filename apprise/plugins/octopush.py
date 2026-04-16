@@ -407,12 +407,7 @@ class NotifyOctopush(NotifyBase):
     @property
     def url_identifier(self):
         """Returns all of the identifiers that make this URL unique."""
-        return (
-            self.secure_protocol,
-            self.api_login,
-            self.api_key,
-            self.sender,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

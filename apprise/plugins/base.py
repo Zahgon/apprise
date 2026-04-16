@@ -93,7 +93,7 @@ class NotifyBase(URLBase):
         library.  Return an empty tuple (the default) when the plugin has no
         optional dependencies that are worth evicting.
         """
-        return ()
+        pass
 
     @classmethod
     def enable(self):
@@ -105,7 +105,7 @@ class NotifyBase(URLBase):
         by the plugin manager, re-enabling will restore the flag but the
         plugin may not function until the process is restarted.
         """
-        self.enabled = True
+        pass
 
     @classmethod
     def disable(self):
@@ -524,28 +524,7 @@ class NotifyBase(URLBase):
 
     async def async_notify(self, *args: Any, **kwargs: Any) -> bool:
         """Performs notification for asynchronous callers."""
-        try:
-            # Build a list of dictionaries that can be used to call send().
-            send_calls = list(self._build_send_calls(*args, **kwargs))
-
-        except TypeError:
-            # Internal error
-            return False
-
-        else:
-            loop = asyncio.get_event_loop()
-
-            # Wrap each call in a coroutine that uses the default executor.
-            # TODO: In the future, allow plugins to supply a native
-            # async_send() method.
-            async def do_send(**kwargs2):
-                send = partial(self.send, **kwargs2)
-                result = await loop.run_in_executor(None, send)
-                return result
-
-            # gather() all calls in parallel.
-            the_cors = (do_send(**kwargs2) for kwargs2 in send_calls)
-            return all(await asyncio.gather(*the_cors))
+        pass
 
     def _build_send_calls(
         self,
@@ -1043,15 +1022,7 @@ class NotifyBase(URLBase):
         And clear them:
          del self.store['key']
         """
-        if self.__store is None:
-            # Initialize our persistent store for use
-            self.__store = PersistentStore(
-                namespace=self.url_id(),
-                path=self.asset.storage_path,
-                mode=self.asset.storage_mode,
-            )
-
-        return self.__store
+        pass
 
     @property
     def tzinfo(self) -> tzinfo:

@@ -114,14 +114,7 @@ class CacheObject:
         If expires or persistent isn't specified then their previous values are
         used.
         """
-
-        self.__value = value
-        self.__class_name = value.__class__.__name__
-        if expires is not None:
-            self.set_expiry(expires)
-
-        if persistent is not None:
-            self.__persistent = bool(persistent)
+        pass
 
     def set_expiry(
         self, expires: Union[datetime, bool, float, int, None] = None
@@ -151,31 +144,11 @@ class CacheObject:
 
     def hash(self) -> str:
         """Our checksum to track the validity of our data."""
-        return self.hash_engine(
-            str(self).encode("utf-8"), usedforsecurity=False
-        ).hexdigest()
+        pass
 
     def json(self) -> Optional[dict[str, Any]]:
         """Returns our preparable json object."""
-
-        return {
-            "v": self.__value,
-            "x": (
-                (self.__expires - EPOCH).total_seconds()
-                if self.__expires
-                else None
-            ),
-            "c": (
-                self.__class_name
-                if not isinstance(self.__value, datetime)
-                else (
-                    "aware_datetime"
-                    if self.__value.tzinfo
-                    else "naive_datetime"
-                )
-            ),
-            "!": self.hash()[: self.hash_length],
-        }
+        pass
 
     @staticmethod
     def instantiate(
@@ -252,32 +225,22 @@ class CacheObject:
     @property
     def value(self) -> Any:
         """Returns our value."""
-        return self.__value
+        pass
 
     @property
     def persistent(self) -> bool:
         """Returns our persistent value."""
-        return self.__persistent
+        pass
 
     @property
     def expires(self) -> Optional[datetime]:
         """Returns the datetime the object will expire."""
-        return self.__expires
+        pass
 
     @property
     def expires_sec(self) -> Optional[float]:
         """Returns the number of seconds from now the object will expire."""
-
-        return (
-            None
-            if self.__expires is None
-            else max(
-                0.0,
-                (
-                    self.__expires - datetime.now(tz=timezone.utc)
-                ).total_seconds(),
-            )
-        )
+        pass
 
     def __bool__(self) -> bool:
         """Returns True it the object hasn't expired, and False if it has."""
@@ -309,20 +272,7 @@ class CacheJSONEncoder(json.JSONEncoder):
     """A JSON Encoder for handling each of our cache objects."""
 
     def default(self, entry):
-        if isinstance(entry, datetime):
-            return entry.strftime(
-                AWARE_DATE_ISO_FORMAT
-                if entry.tzinfo is not None
-                else NAIVE_DATE_ISO_FORMAT
-            )
-
-        elif isinstance(entry, CacheObject):
-            return entry.json()
-
-        elif isinstance(entry, bytes):
-            return base64.b64encode(entry).decode("utf-8")
-
-        return super().default(entry)
+        pass
 
 
 class PersistentStore:
@@ -763,53 +713,7 @@ class PersistentStore:
 
         If no key is provided, then the default is used
         """
-
-        if key is None:
-            key = self.base_key
-
-        elif not isinstance(key, str) or not self.__valid_key.match(key):
-            raise AttributeError(
-                f"Persistent Storage key ({key} provided is invalid"
-            )
-
-        if self.__mode == PersistentStoreMode.MEMORY:
-            # Nothing further can be done
-            raise FileNotFoundError()
-
-        io_file = os.path.join(self.__data_path, f"{key}{self.__extension}")
-        try:
-            return (
-                open(
-                    io_file,
-                    mode=mode,
-                    buffering=buffering,
-                    encoding=encoding,
-                    errors=errors,
-                    newline=newline,
-                    closefd=closefd,
-                    opener=opener,
-                )
-                if not compress
-                else gzip.open(
-                    io_file,
-                    compresslevel=compresslevel,
-                    encoding=encoding,
-                    errors=errors,
-                    newline=newline,
-                )
-            )
-
-        except FileNotFoundError:
-            # pass along (but wrap with Apprise exception)
-            raise exception.AppriseFileNotFound(
-                f"No such file or directory: '{io_file}'"
-            ) from None
-
-        except (OSError, zlib.error) as e:
-            # We can't access the file or it does not exist
-            logger.warning("Could not read with persistent key: %s", key)
-            logger.debug("Persistent Storage Exception: %s", str(e))
-            raise exception.AppriseDiskIOError(str(e)) from None
+        pass
 
     def get(
         self,
@@ -841,31 +745,7 @@ class PersistentStore:
         lazy: bool = True,
     ) -> bool:
         """Cache reference."""
-
-        if self._cache is None and not self.__load_cache():
-            return False
-
-        cache = CacheObject(value, expires, persistent=persistent)
-        # Fetch our cache value
-        try:
-            if lazy and cache == self._cache[key]:
-                # We're done; nothing further to do
-                return True
-
-        except KeyError:
-            pass
-
-        # Store our new cache
-        self._cache[key] = CacheObject(value, expires, persistent=persistent)
-
-        # Set our dirty flag
-        self.__dirty = persistent
-
-        if self.__dirty and self.__mode == PersistentStoreMode.FLUSH:
-            # Flush changes to disk
-            return self.flush()
-
-        return True
+        pass
 
     def clear(self, *args: str) -> Optional[bool]:
         """Remove one or more cache entry by it's key.
@@ -1352,58 +1232,7 @@ class PersistentStore:
         closest: bool = True,
     ) -> list[str]:
         """Scansk a path provided and returns namespaces detected."""
-
-        logger.trace("Persistent path can of: %s", path)
-
-        def is_namespace(x):
-            """Validate what was detected is a valid namespace."""
-            return os.path.isdir(
-                os.path.join(path, x)
-            ) and PersistentStore.__valid_key.match(x)
-
-        # Handle our namespace searching
-        if namespace:
-            if isinstance(namespace, str):
-                namespace = [namespace]
-
-            elif not isinstance(namespace, (tuple, set, list)):
-                raise AttributeError(
-                    "namespace must be None, a string, or a tuple/set/list "
-                    "of strings"
-                )
-
-        try:
-            # Acquire all of the files in question
-            namespaces = (
-                [
-                    ns
-                    for ns in filter(is_namespace, os.listdir(path))
-                    if not namespace
-                    or next(
-                        (True for n in namespace if ns.startswith(n)), False
-                    )
-                ]
-                if closest
-                else [
-                    ns
-                    for ns in filter(is_namespace, os.listdir(path))
-                    if not namespace or ns in namespace
-                ]
-            )
-
-        except FileNotFoundError:
-            # no worries; Nothing to do
-            logger.debug("Disk Prune path not found; nothing to clean.")
-            return []
-
-        except OSError as e:
-            # Permission error of some kind or disk problem...
-            # There is nothing we can do at this point
-            logger.error("Disk Scan detetcted inaccessible path: %s", path)
-            logger.debug("Persistent Storage Exception: %s", str(e))
-            return []
-
-        return namespaces
+        pass
 
     @staticmethod
     def disk_prune(
@@ -1423,180 +1252,7 @@ class PersistentStore:
         if action is not set to False, directories to be removed are returned
         only
         """
-
-        # Prepare our File Expiry
-        expires = (
-            datetime.now() - timedelta(seconds=expires)
-            if isinstance(expires, (float, int)) and expires >= 0
-            else PersistentStore.default_file_expiry
-        )
-
-        # Get our namespaces
-        namespaces = PersistentStore.disk_scan(path, namespace)
-
-        # Track matches
-        map_ = {}
-
-        for namespace in namespaces:
-            # Prepare our map
-            map_[namespace] = []
-
-            # Reference Directories
-            base_dir = os.path.join(path, namespace)
-            data_dir = os.path.join(base_dir, PersistentStore.data_dir)
-            temp_dir = os.path.join(base_dir, PersistentStore.temp_dir)
-
-            # Careful to only focus on files created by this Persistent Store
-            # object
-            files = [
-                os.path.join(
-                    base_dir,
-                    f"{PersistentStore.__cache_key}"
-                    f"{PersistentStore.__extension}",
-                ),
-                os.path.join(
-                    base_dir,
-                    f"{PersistentStore.__cache_key}"
-                    f"{PersistentStore.__backup_extension}",
-                ),
-            ]
-
-            # Update our files (applying what was defined above too)
-            valid_data_re = re.compile(
-                r".*("
-                + re.escape(PersistentStore.__extension)
-                + r"|"
-                + re.escape(PersistentStore.__backup_extension)
-                + r")$"
-            )
-
-            files = [
-                path
-                for path in filter(
-                    os.path.isfile,
-                    chain(
-                        glob.glob(
-                            os.path.join(data_dir, "*"), recursive=False
-                        ),
-                        files,
-                    ),
-                )
-                if valid_data_re.match(path)
-            ]
-
-            # Now all temporary files
-            files.extend(
-                list(
-                    filter(
-                        os.path.isfile,
-                        glob.glob(
-                            os.path.join(temp_dir, "*"), recursive=False
-                        ),
-                    )
-                )
-            )
-
-            # Track if we should do a directory sweep later on
-            dir_sweep = True
-
-            # Scan our files
-            for file in files:
-                try:
-                    mtime = datetime.fromtimestamp(os.path.getmtime(file))
-
-                except FileNotFoundError:
-                    # no worries; we were removing it anyway
-                    continue
-
-                except OSError as e:
-                    # Permission error of some kind or disk problem...
-                    # There is nothing we can do at this point
-                    logger.error(
-                        "Disk Prune (ns=%s, clean=%s) detetcted inaccessible "
-                        "file: %s",
-                        namespace,
-                        "yes" if action else "no",
-                        file,
-                    )
-                    logger.debug("Persistent Storage Exception: %s", str(e))
-
-                    # No longer worth doing a directory sweep
-                    dir_sweep = False
-                    continue
-
-                if expires < mtime:
-                    continue
-
-                #
-                # Handle Removing
-                #
-                record = {
-                    "path": file,
-                    "removed": False,
-                }
-
-                if action:
-                    try:
-                        os.unlink(file)
-                        # Update our record
-                        record["removed"] = True
-                        logger.info(
-                            "Disk Prune (ns=%s, clean=%s) removed persistent "
-                            "file: %s",
-                            namespace,
-                            "yes" if action else "no",
-                            file,
-                        )
-
-                    except FileNotFoundError:
-                        # no longer worth doing a directory sweep
-                        dir_sweep = False
-
-                        # otherwise, no worries; we were removing the file
-                        # anyway
-
-                    except OSError as e:
-                        # Permission error of some kind or disk problem...
-                        # There is nothing we can do at this point
-                        logger.error(
-                            "Disk Prune (ns=%s, clean=%s) failed to remove "
-                            "persistent file: %s",
-                            namespace,
-                            "yes" if action else "no",
-                            file,
-                        )
-
-                        logger.debug(
-                            "Persistent Storage Exception: %s", str(e)
-                        )
-
-                        # No longer worth doing a directory sweep
-                        dir_sweep = False
-
-                # Store our record
-                map_[namespace].append(record)
-
-            # Memory tidy
-            del files
-
-            if dir_sweep:
-                # Gracefully cleanup our namespace directory. It's okay if we
-                # fail; This just means there were files in the directory.
-                for dirpath in (temp_dir, data_dir, base_dir):
-                    if action:
-                        try:
-                            os.rmdir(dirpath)
-                            logger.info(
-                                "Disk Prune (ns=%s, clean=%s) removed "
-                                "persistent dir: %s",
-                                namespace,
-                                "yes" if action else "no",
-                                dirpath,
-                            )
-                        except OSError:
-                            # do nothing;
-                            pass
-        return map_
+        pass
 
     def size(
         self,
@@ -1723,144 +1379,19 @@ class PersistentStore:
 
         delete('key', 'key2') delete(all=True) delete(temp=True, cache=True)
         """
-
-        # Our failure flag
-        has_error = False
-
-        valid_key_re = re.compile(
-            r"^(?P<key>.+)("
-            + re.escape(self.__backup_extension)
-            + r"|"
-            + re.escape(self.__extension)
-            + r")$",
-            re.I,
-        )
-
-        # Default asignments
-        if all is None:
-            all = bool(not (len(args) or temp or cache))
-        if temp is None:
-            temp = bool(all)
-        if cache is None:
-            cache = bool(all)
-
-        if cache and self._cache:
-            # Reset our object
-            self._cache.clear()
-            # Reset dirt flag
-            self.__dirty = False
-
-        for path in self.files(exclude=False):
-            # Some information we use to validate the actions of our clean()
-            # call. This is so we don't remove anything we shouldn't
-            base = os.path.dirname(path)
-            fname = os.path.basename(path)
-
-            # Clean printable path details
-            ppath = os.path.join(os.path.dirname(base), fname)
-
-            if base == self.__base_path and cache:
-                # We're handling a cache file (hopefully)
-                result = valid_key_re.match(fname)
-                key = (
-                    None
-                    if not result
-                    else (
-                        result["key"]
-                        if self.__valid_key.match(result["key"])
-                        else None
-                    )
-                )
-
-                if validate and key != self.__cache_key:
-                    # We're not dealing with a cache key
-                    logger.debug(
-                        "Persistent File cleanup ignoring file: %s", path
-                    )
-                    continue
-
-                #
-                # We should proceed with removing the file if we get here
-                #
-
-            elif base == self.__data_path and (args or all):
-                # We're handling a file found in our custom data path
-                result = valid_key_re.match(fname)
-                key = (
-                    None
-                    if not result
-                    else (
-                        result["key"]
-                        if self.__valid_key.match(result["key"])
-                        else None
-                    )
-                )
-
-                if validate and key is None:
-                    # we're set to validate and a non-valid file was found
-                    logger.debug(
-                        "Persistent File cleanup ignoring file: %s", path
-                    )
-                    continue
-
-                elif not all and (key is None or key not in args):
-                    # no match found
-                    logger.debug(
-                        "Persistent File cleanup ignoring file: %s", path
-                    )
-                    continue
-
-                #
-                # We should proceed with removing the file if we get here
-                #
-
-            elif base == self.__temp_path and temp:
-                #
-                # This directory is a temporary path and nothing in here needs
-                # to be further verified. Proceed with the removing of the file
-                #
-                pass
-
-            else:
-                # No match; move on
-                logger.debug("Persistent File cleanup ignoring file: %s", path)
-                continue
-
-            try:
-                os.unlink(path)
-                logger.info("Removed persistent file: %s", ppath)
-
-            except FileNotFoundError:
-                # no worries; we were removing it anyway
-                pass
-
-            except OSError as e:
-                # Permission error of some kind or disk problem...
-                # There is nothing we can do at this point
-                has_error = True
-                logger.error("Failed to remove persistent file: %s", ppath)
-                logger.debug("Persistent Storage Exception: %s", str(e))
-
-        # Reset our reference variables
-        self.__cache_size = None
-        self.__cache_files.clear()
-
-        return not has_error
+        pass
 
     @property
     def cache_file(self) -> str:
         """Returns the full path to the namespace directory."""
-        return os.path.join(
-            self.__base_path,
-            f"{self.__cache_key}{self.__extension}",
-        )
+        pass
 
     @property
     def path(self) -> Optional[str]:
         """Returns the full path to the namespace directory."""
-        return self.__base_path
+        pass
 
     @property
     def mode(self) -> PersistentStoreMode:
         """Returns the Persistent Storage mode."""
-        return self.__mode
+        pass

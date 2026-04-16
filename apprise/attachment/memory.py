@@ -112,9 +112,7 @@ class AttachMemory(AttachBase):
 
     def open(self, *args, **kwargs):
         """Return our memory object."""
-        # Return our object
-        self._data.seek(0, 0)
-        return self._data
+        pass
 
     def __enter__(self):
         """Support with clause."""
@@ -201,11 +199,7 @@ class AttachMemory(AttachBase):
     @property
     def path(self):
         """Return the filename."""
-        if not self.exists():
-            # we could not obtain our path
-            return None
-
-        return self._name
+        pass
 
     def __len__(self):
         """Returns the size of he memory attachment."""

@@ -742,7 +742,7 @@ class NotifyJira(NotifyBase):
         another simliar one. Targets or end points should never be identified
         here.
         """
-        return (self.secure_protocol, self.region_name, self.apikey)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """

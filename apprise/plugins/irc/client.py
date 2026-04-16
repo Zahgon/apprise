@@ -122,7 +122,7 @@ class IRCClient:
     @property
     def nickname(self) -> str:
         """Returns the accepted nickname."""
-        return self.sm.ctx.accepted_nick
+        pass
 
     def connect(self) -> None:
         self.transport.connect()

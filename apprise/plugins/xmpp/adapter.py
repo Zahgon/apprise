@@ -263,10 +263,7 @@ def _get_client_subclass(base_cls: type[Any]) -> type[Any]:
 
         def _failed_auth(self, *args: object, **kwargs: object) -> None:
             # Authentication failure is always a hard failure.
-            self._auth_failed = True
-            if self._session_started_evt is not None:
-                self._session_started_evt.clear()
-            self.disconnect()
+            pass
 
         def _on_session_start(self, *args: object, **kwargs: object) -> Any:
             """Slixmpp event handler entrypoint.
@@ -275,41 +272,10 @@ def _get_client_subclass(base_cls: type[Any]) -> type[Any]:
             asyncio.create_task() because that can bind to the wrong
             loop, or no loop, and leak coroutines.
             """
-            coro = self._session_start(*args, **kwargs)
-
-            # Schedule on the event loop for both one-shot and keepalive.
-            loop = getattr(self, "loop", None)
-
-            # If the loop is missing or already closing, we MUST close the
-            # coroutine immediately to prevent "never awaited" warnings.
-            if loop is None or not loop.is_running():
-                with contextlib.suppress(Exception):
-                    coro.close()
-                return None
-
-            try:
-                task = loop.create_task(coro)
-
-                def _log_task(t: asyncio.Task[Any]) -> None:
-                    if t.cancelled():
-                        return
-
-                    exc = t.exception()
-                    if exc is not None:
-                        self.logger.error("XMPP task failed: %s", exc)
-
-                task.add_done_callback(_log_task)
-
-            except Exception:
-                # Fallback closure if loop.create_task fails
-                with contextlib.suppress(Exception):
-                    coro.close()
-
-            return None
+            pass
 
         def _disconnected(self, *args: object, **kwargs: object) -> None:
-            if self._session_started_evt is not None:
-                self._session_started_evt.clear()
+            pass
 
     _CLIENT_SUBCLASS_CACHE[key] = _Client
     return _Client
@@ -468,12 +434,7 @@ class SlixmppAdapter:
             return
 
         def _shutdown() -> None:
-            try:
-                if client is not None:
-                    client.disconnect()
-            finally:
-                with contextlib.suppress(Exception):
-                    loop.stop()
+            pass
 
         with contextlib.suppress(Exception):
             loop.call_soon_threadsafe(_shutdown)
@@ -514,133 +475,7 @@ class SlixmppAdapter:
         shared: dict[str, Any] = {"loop": None, "client": None}
 
         def runner() -> None:
-            loop: Optional[asyncio.AbstractEventLoop] = None
-            # type: ignore[name-defined]
-            start = time.monotonic()
-
-            try:
-                loop = asyncio.new_event_loop()  # type: ignore[union-attr]
-                asyncio.set_event_loop(loop)  # type: ignore[union-attr]
-                shared["loop"] = loop
-
-                targets = (
-                    list(self.targets)
-                    if self.targets
-                    else [("chat", self.config.jid)]
-                )
-
-                roster_timeout = (
-                    max(2.0, min(10.0, self.timeout / 3.0))
-                    if self.roster
-                    else 0.0
-                )
-
-                client = _build_client(
-                    jid=self.config.jid,
-                    password=self.config.password,
-                    oneshot=True,
-                    logger=self.logger,
-                    targets=targets,
-                    subject=self.subject,
-                    body=self.body,
-                    before_message=self.before_message,
-                    want_muc=self._want_muc,
-                    nick=self.nickname,
-                    want_roster=self.roster,
-                    roster_timeout=roster_timeout,
-                    session_started_evt=None,
-                )
-
-                shared["client"] = client
-
-                # Prevent Slixmpp from owning loop lifecycle
-                with contextlib.suppress(Exception):
-                    client.loop = loop  # type: ignore[assignment]
-
-                # Resolve connection behaviour from secure mode
-                mode_cfg = SECURE_MODES.get(self.config.secure)
-                if not mode_cfg:
-                    raise ValueError(
-                        f"Unsupported XMPP secure mode: {self.config.secure}"
-                    )
-
-                client.enable_plaintext = bool(mode_cfg["enable_plaintext"])
-                client.enable_starttls = bool(mode_cfg["enable_starttls"])
-                client.enable_direct_tls = bool(mode_cfg["enable_direct_tls"])
-
-                # Only attach an SSL context when TLS may be used
-                if not client.enable_plaintext:
-                    client.ssl_context = self._ssl_context(
-                        self.config.verify_certificate
-                    )
-
-                # Slixmpp >= 1.10.0 connect() returns a Future.
-                connect_timeout = max(3.0, min(15.0, self.timeout / 3.0))
-                connect_fut = client.connect(
-                    host=self.config.host,
-                    port=self.config.port,
-                )
-
-                try:
-                    ok = loop.run_until_complete(
-                        asyncio.wait_for(
-                            connect_fut,
-                            timeout=connect_timeout,
-                        )
-                    )
-                    if ok is False:
-                        self.logger.warning("XMPP connect failed.")
-                        with contextlib.suppress(Exception):
-                            client.disconnect()
-                        result[0] = False
-                        return
-
-                except asyncio.TimeoutError:
-                    self.logger.warning(
-                        "XMPP connect timed out after %.2fs", connect_timeout
-                    )
-                    result[0] = False
-                    return
-
-                except Exception as e:
-                    self.logger.debug("XMPP connect failed: %s", e)
-                    result[0] = False
-                    return
-
-                # Run until disconnected, but still respect our overall
-                # timeout.
-                elapsed = time.monotonic() - start
-                remaining = max(0.0, self.timeout - elapsed)
-                run_timeout = max(1.0, remaining)
-
-                try:
-                    loop.run_until_complete(
-                        asyncio.wait_for(  # type: ignore[arg-type]
-                            client.disconnected, timeout=run_timeout
-                        )
-                    )
-                except asyncio.TimeoutError:  # type: ignore[attr-defined]
-                    self.logger.warning(
-                        "XMPP session timed out after %.2fs", run_timeout
-                    )
-                    with contextlib.suppress(Exception):
-                        client.disconnect()
-                    result[0] = False
-                    return
-
-                # Disconnect happened, success depends on auth state
-                result[0] = not bool(getattr(client, "_auth_failed", False))
-
-            except Exception as e:  # pragma: no cover
-                self.logger.warning("XMPP send failed.")
-                self.logger.debug("XMPP Exception: %s", e)
-                result[0] = False
-
-            finally:
-                loop = shared.get("loop")
-                if loop is not None:
-                    self._finalize_loop(loop)
-                done.set()
+            pass
 
         t = threading.Thread(target=runner, name="apprise-xmpp", daemon=True)
         t.start()
@@ -708,91 +543,7 @@ class SlixmppAdapter:
         return True
 
     def _keepalive_runner(self) -> None:
-        loop: Optional[asyncio.AbstractEventLoop] = None
-        # type: ignore[name-defined]
-        published = False
-
-        try:
-            loop = asyncio.new_event_loop()  # type: ignore[union-attr]
-            asyncio.set_event_loop(loop)  # type: ignore[union-attr]
-
-            session_started = asyncio.Event()  # type: ignore[union-attr]
-            connect_lock = asyncio.Lock()  # type: ignore[union-attr]
-
-            roster_timeout = (
-                max(2.0, min(10.0, self.timeout / 3.0)) if self.roster else 0.0
-            )
-
-            client = _build_client(
-                jid=self.config.jid,
-                password=self.config.password,
-                oneshot=False,
-                logger=self.logger,
-                want_muc=self._want_muc,
-                want_roster=self.roster,
-                roster_timeout=roster_timeout,
-                session_started_evt=session_started,
-            )
-
-            with contextlib.suppress(Exception):
-                client.loop = loop  # type: ignore[assignment]
-
-            mode_cfg = SECURE_MODES.get(self.config.secure)
-            if not mode_cfg:
-                raise ValueError(
-                    f"Unsupported XMPP secure mode: {self.config.secure}"
-                )
-
-            client.enable_plaintext = bool(mode_cfg["enable_plaintext"])
-            client.enable_starttls = bool(mode_cfg["enable_starttls"])
-            client.enable_direct_tls = bool(mode_cfg["enable_direct_tls"])
-
-            if not client.enable_plaintext:
-                client.ssl_context = self._ssl_context(
-                    self.config.verify_certificate
-                )
-
-            # keepalive=yes implies enabling XEP-0199 keepalive pings
-            with contextlib.suppress(Exception):
-                client.register_plugin("xep_0199", {"keepalive": True})
-
-            if self._want_muc:
-                # Multi-User Chat
-                with contextlib.suppress(Exception):
-                    client.register_plugin("xep_0045")
-
-            with self._state_lock:
-                if self._closing:
-                    return
-
-                self._loop = loop
-                self._client = client
-                self._connect_lock = connect_lock
-                self._session_started = session_started
-                published = True
-
-            self._loop_ready.set()
-
-            loop.run_forever()
-
-        except Exception as e:  # pragma: no cover
-            self.logger.warning("XMPP keepalive worker failed.")
-            self.logger.debug("XMPP keepalive exception: %s", e)
-
-        finally:
-            if published:
-                with self._state_lock:
-                    if self._closing and self._loop is loop:
-                        # Clear internal references if we are exiting the
-                        # worker.
-                        self._loop = None
-                        self._client = None
-                        self._connect_lock = None
-                        self._session_started = None
-                        self._thread = None
-
-            if loop is not None:
-                self._finalize_loop(loop)
+        pass
 
     async def _connect_if_required(self) -> bool:
         if self._loop is None or self._client is None:

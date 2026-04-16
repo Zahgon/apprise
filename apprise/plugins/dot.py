@@ -506,12 +506,7 @@ class NotifyDot(NotifyBase):
         """Returns all of the identifiers that make this URL unique from
         another similar one.
         """
-        return (
-            self.secure_protocol,
-            self.apikey,
-            self.device_id,
-            self.mode,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

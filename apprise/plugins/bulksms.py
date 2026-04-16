@@ -459,11 +459,7 @@ class NotifyBulkSMS(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol,
-            self.user if self.user else None,
-            self.password if self.password else None,
-        )
+        pass
 
     def __len__(self):
         """Returns the number of targets associated with this notification."""

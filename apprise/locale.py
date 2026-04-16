@@ -149,24 +149,7 @@ class AppriseLocale:
                 # defined. afterwards, the language falls back to whatever
                 # it was.
         """
-
-        if GETTEXT_LOADED is False:
-            # Do nothing
-            yield None
-
-            # we're done
-            return
-
-        # Tidy the language
-        lang = AppriseLocale.detect_language(lang, detect_fallback=False)
-        if lang not in self._gtobjs and not self.add(lang, set_default=False):
-            # Do Nothing
-            yield getattr(self._gtobjs[self.lang], mapto)
-        else:
-            # Yield
-            yield getattr(self._gtobjs[lang], mapto)
-
-        return
+        pass
 
     @property
     def gettext(self):
@@ -174,7 +157,7 @@ class AppriseLocale:
 
         Useful for assigning to `_`
         """
-        return self._gtobjs[self.lang].gettext
+        pass
 
     @staticmethod
     def detect_language(lang=None, detect_fallback=True):
@@ -271,8 +254,7 @@ class LazyTranslation:
 # Lazy translation handling
 def gettext_lazy(text):
     """A dummy function that can be referenced."""
-
-    return LazyTranslation(text=text)
+    pass
 
 
 # Identify our Translatable content

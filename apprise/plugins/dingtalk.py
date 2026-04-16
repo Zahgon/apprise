@@ -283,11 +283,7 @@ class NotifyDingTalk(NotifyBase):
     @property
     def title_maxlen(self):
         """The title isn't used when not in markdown mode."""
-        return (
-            NotifyBase.title_maxlen
-            if self.notify_format == NotifyFormat.MARKDOWN
-            else 0
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -324,7 +320,7 @@ class NotifyDingTalk(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.secret, self.token)
+        pass
 
     def __len__(self):
         """Returns the number of targets associated with this notification."""

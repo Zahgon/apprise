@@ -314,7 +314,7 @@ class NotifyFlock(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.token)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

@@ -39,12 +39,4 @@ def dataclass_compat(*dargs: Any, **dkwargs: Any) -> Callable[[_T], _T]:
 
     Python 3.9 does not support slots= in dataclasses.dataclass().
     """
-    try:
-        return _dataclass(*dargs, **dkwargs)
-
-    except TypeError:
-        # Only strip slots when it is the cause
-        if "slots" in dkwargs:
-            dkwargs.pop("slots", None)
-            return _dataclass(*dargs, **dkwargs)
-        raise
+    pass

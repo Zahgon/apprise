@@ -123,9 +123,7 @@ class IRCMessage:
     def numeric(self) -> Optional[int]:
         """Return numeric reply code as int when command is a 3-digit
         string."""
-        if self.command.isdigit() and len(self.command) == 3:
-            return int(self.command)
-        return None
+        pass
 
 
 def parse_irc_line(line: str) -> IRCMessage:

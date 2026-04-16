@@ -311,15 +311,7 @@ class NotifyRSyslog(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.protocol,
-            self.host,
-            (
-                self.port
-                if self.port
-                else self.template_tokens["port"]["default"]
-            ),
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

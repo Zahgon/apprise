@@ -58,11 +58,11 @@ def apply_template(template, app_mode=TemplateType.RAW, **kwargs):
 
     def _escape_raw(content):
         # No escaping necessary
-        return content
+        pass
 
     def _escape_json(content):
         # remove surounding quotes
-        return json.dumps(content)[1:-1]
+        pass
 
     # Our escape function
     fn = _escape_json if app_mode == TemplateType.JSON else _escape_raw

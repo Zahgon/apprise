@@ -375,7 +375,7 @@ class NotifyD7Networks(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.token)
+        pass
 
     def __len__(self):
         """Returns the number of targets associated with this notification."""

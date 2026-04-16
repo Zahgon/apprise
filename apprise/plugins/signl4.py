@@ -265,10 +265,7 @@ class NotifySIGNL4(NotifyBase):
         another simliar one. Targets or end points should never be identified
         here.
         """
-        return (
-            self.secure_protocol,
-            self.secret,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """

@@ -352,12 +352,4 @@ class ApprisePGPController:
         """Returns the Public Keyfile Path if set otherwise it returns None
         This property returns False if a keyfile was provided, but was
         invalid."""
-        return (
-            None
-            if self._pub_keyfile is None
-            else (
-                False
-                if not self._pub_keyfile[0]
-                else self._pub_keyfile[0].path
-            )
-        )
+        pass

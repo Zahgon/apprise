@@ -558,7 +558,7 @@ class NotifyNotificationAPI(NotifyBase):
         another similar one. Targets or end points should never be identified
         here.
         """
-        return (self.secure_protocol[0], self.client_id, self.client_secret)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """

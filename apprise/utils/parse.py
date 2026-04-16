@@ -1040,7 +1040,7 @@ def url_assembly(encode=False, **kwargs):
 
     def _no_encode(content, *args, **kwargs):
         # dummy function that does nothing to content
-        return content
+        pass
 
     quote_ = quote if encode else _no_encode
 

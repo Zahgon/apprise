@@ -365,13 +365,7 @@ class NotifyGrowl(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.user,
-            self.password,
-            self.host,
-            self.port if self.port else self.default_port,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""
@@ -478,4 +472,4 @@ class NotifyGrowl(NotifyBase):
         """Return a tuple of top-level Python package names that this plugin
         imported as optional runtime dependencies.
         """
-        return ("gntp",)
+        pass

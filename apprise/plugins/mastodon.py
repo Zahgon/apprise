@@ -408,24 +408,12 @@ class NotifyMastodon(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol[0],
-            self.token,
-            self.host,
-            self.port if self.port else (443 if self.secure else 80),
-        )
+        pass
 
     @property
     def body_maxlen(self):
         """Return the body space available after configured status tokens."""
-
-        tokens = self.ping_tokens(
-            " ".join(self.targets + self.tags + self.ping),
-            normalize=True,
-        )
-        return max(
-            self.mastodon_body_maxlen - len(self.ping_payload(tokens)), 0
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

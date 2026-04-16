@@ -273,7 +273,7 @@ class Notify46Elks(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol[0], self.user, self.password, self.source)
+        pass
 
     def url(self, privacy: bool = False, *args: Any, **kwargs: Any) -> str:
         """Returns the URL built dynamically based on specified arguments."""

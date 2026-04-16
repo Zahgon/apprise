@@ -352,7 +352,7 @@ class NotifyDapnet(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.user, self.password)
+        pass
 
     def __len__(self):
         """Returns the number of targets associated with this notification."""

@@ -127,14 +127,7 @@ class NotifyPushjet(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (
-            self.secure_protocol if self.secure else self.protocol,
-            self.user,
-            self.password,
-            self.host,
-            self.port,
-            self.secret_key,
-        )
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

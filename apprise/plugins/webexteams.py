@@ -548,7 +548,7 @@ class NotifyWebexTeams(NotifyBase):
     def body_maxlen(self):
         """The maximum allowable characters allowed in the body per message.
         Webhook mode is limited to 1000 chars; the Bot API allows 7439."""
-        return 1000 if self.mode == WebexTeamsMode.WEBHOOK else 7439
+        pass
 
     @property
     def url_identifier(self):
@@ -557,11 +557,7 @@ class NotifyWebexTeams(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        if self.mode == WebexTeamsMode.WEBHOOK:
-            return (self.secure_protocol[0], self.token)
-
-        # BOT mode
-        return (self.secure_protocol[0], self.access_token)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

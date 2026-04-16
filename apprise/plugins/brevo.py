@@ -303,7 +303,7 @@ class NotifyBrevo(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.apikey, self.from_email)
+        pass
 
     def url(self, privacy=False, *args, **kwargs):
         """Returns the URL built dynamically based on specified arguments."""

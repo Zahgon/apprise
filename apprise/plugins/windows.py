@@ -132,12 +132,7 @@ class NotifyWindows(NotifyBase):
 
     def _on_destroy(self, hwnd, msg, wparam, lparam):
         """Destroy callback function."""
-
-        nid = (self.hwnd, 0)
-        win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, nid)
-        win32api.PostQuitMessage(0)
-
-        return 0
+        pass
 
     def send(self, body, title="", notify_type=NotifyType.INFO, **kwargs):
         """Perform Windows Notification."""

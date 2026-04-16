@@ -623,7 +623,7 @@ class NotifyPushover(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.user_key, self.token)
+        pass
 
     def __len__(self):
         """Returns the number of HTTP requests this instance will make.

@@ -186,7 +186,7 @@ class NotifyChanify(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.secure_protocol, self.token)
+        pass
 
     @staticmethod
     def parse_url(url):

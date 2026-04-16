@@ -115,12 +115,6 @@ def notify(on, name=None):
 
     def wrapper(func):
         """Instantiate our custom (notification) plugin."""
-
-        # Generate
-        CustomNotifyPlugin.instantiate_plugin(
-            url=on, send_func=func, name=name
-        )
-
-        return func
+        pass
 
     return wrapper

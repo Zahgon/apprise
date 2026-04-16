@@ -457,26 +457,7 @@ class Apprise:
 
         The arguments are identical to those of Apprise.notify().
         """
-        try:
-            # Process arguments and build synchronous and asynchronous calls
-            # (this step can throw internal errors).
-            sequential_calls, parallel_calls = self._create_notify_calls(
-                *args, **kwargs
-            )
-
-        except TypeError:
-            # No notifications sent, and there was an internal error.
-            return False
-
-        if not sequential_calls and not parallel_calls:
-            # Nothing to send
-            return None
-
-        sequential_result = Apprise._notify_sequential(*sequential_calls)
-        parallel_result = await Apprise._notify_parallel_asyncio(
-            *parallel_calls
-        )
-        return sequential_result and parallel_result
+        pass
 
     def _create_notify_calls(self, *args, **kwargs):
         """Creates notifications for all the plugins loaded.
@@ -728,42 +709,7 @@ class Apprise:
     async def _notify_parallel_asyncio(*servers_kwargs):
         """Process a list of async_notify() calls in parallel and
         asynchronously."""
-
-        n_calls = len(servers_kwargs)
-
-        # 0-length case
-        if n_calls == 0:
-            return True
-
-        # (Unlike with the thread pool, we don't optimize for the single-
-        # notification case because asyncio can do useful work while waiting
-        # for that thread to complete)
-
-        # Create log entry
-        logger.info(
-            "Notifying %d service(s) asynchronously.", len(servers_kwargs)
-        )
-
-        async def do_call(server, kwargs):
-            return await server.async_notify(**kwargs)
-
-        cors = (do_call(server, kwargs) for (server, kwargs) in servers_kwargs)
-        results = await asyncio.gather(*cors, return_exceptions=True)
-
-        if any(
-            isinstance(status, Exception) and not isinstance(status, TypeError)
-            for status in results
-        ):
-            # A catch all so we don't have to abort early just because
-            # one of our plugins has a bug in it.
-            logger.exception("Unhandled Notification Exception")
-            return False
-
-        if any(isinstance(status, TypeError) for status in results):
-            # These are our internally thrown notifications.
-            return False
-
-        return all(results)
+        pass
 
     def json(
         self,
@@ -774,43 +720,7 @@ class Apprise:
         path: Optional[str] = None,
     ) -> Union[str, bool]:
         """Returns a json response associated with the Apprise object."""
-        details = self.details(
-            lang=lang,
-            show_requirements=show_requirements,
-            show_disabled=show_disabled,
-        )
-
-        if not path:
-            return json.dumps(
-                details,
-                separators=(",", ":"),
-                indent=indent,
-                cls=AppriseJSONEncoder,
-            )
-
-        with open(path, "w") as fp:
-            try:
-                json.dump(
-                    details,
-                    fp,
-                    separators=(",", ":"),
-                    indent=indent,
-                    cls=AppriseJSONEncoder,
-                    ensure_ascii=False,
-                )
-
-            except (OSError, EOFError) as e:
-                logger.error("Apprise details dumpfile inaccessible: %s", path)
-                logger.debug("Apprise details dump Exception: %s", e)
-
-                # Early Exit
-                return False
-
-            finally:
-                # Reduce memory
-                del details
-
-        return True
+        pass
 
     def details(
         self,
@@ -819,93 +729,11 @@ class Apprise:
         show_disabled: bool = False,
     ) -> dict[str, Any]:
         """Returns the details associated with the Apprise object."""
-
-        # general object returned
-        response = {
-            # Defines the current version of Apprise
-            "version": __version__,
-            # Lists all of the currently supported Notifications
-            "schemas": [],
-            # Includes the configured asset details
-            "asset": self.asset.details(),
-        }
-
-        for plugin in N_MGR.plugins():
-            # Iterate over our hashed plugins and dynamically build details on
-            # their status:
-
-            content = {
-                "service_name": getattr(plugin, "service_name", None),
-                "service_url": getattr(plugin, "service_url", None),
-                "setup_url": getattr(plugin, "setup_url", None),
-                # Placeholder - populated below
-                "details": None,
-                # Let upstream service know of the plugins that support
-                # attachments
-                "attachment_support": getattr(
-                    plugin, "attachment_support", False
-                ),
-                # Differentiat between what is a custom loaded plugin and
-                # which is native.
-                "category": getattr(plugin, "category", None),
-            }
-
-            # Standard protocol(s) should be None or a tuple
-            enabled = getattr(plugin, "enabled", True)
-            if not show_disabled and not enabled:
-                # Do not show inactive plugins
-                continue
-
-            elif show_disabled:
-                # Add current state to response
-                content["enabled"] = enabled
-
-            # Standard protocol(s) should be None or a tuple
-            protocols = getattr(plugin, "protocol", None)
-            if isinstance(protocols, str):
-                protocols = (protocols,)
-
-            # Secure protocol(s) should be None or a tuple
-            secure_protocols = getattr(plugin, "secure_protocol", None)
-            if isinstance(secure_protocols, str):
-                secure_protocols = (secure_protocols,)
-
-            # Add our protocol details to our content
-            content.update(
-                {
-                    "protocols": protocols,
-                    "secure_protocols": secure_protocols,
-                }
-            )
-
-            if not lang:
-                # Simply return our results
-                content["details"] = plugins.details(plugin)
-                if show_requirements:
-                    content["requirements"] = plugins.requirements(plugin)
-
-            else:
-                # Emulate the specified language when returning our results
-                with self.locale.lang_at(lang):
-                    content["details"] = plugins.details(plugin)
-                    if show_requirements:
-                        content["requirements"] = plugins.requirements(plugin)
-
-            # Build our response object
-            response["schemas"].append(content)
-
-        return response
+        pass
 
     def urls(self, privacy: bool = False) -> list[str]:
         """Returns all of the loaded URLs defined in this apprise object."""
-        urls = []
-        for s in self.servers:
-            if isinstance(s, (ConfigBase, AppriseConfig)):
-                for s_ in s.servers():
-                    urls.append(s_.url(privacy=privacy))
-            else:
-                urls.append(s.url(privacy=privacy))
-        return urls
+        pass
 
     def pop(self, index: int) -> NotifyBase:
         """Removes an indexed Notification Service from the stack and returns

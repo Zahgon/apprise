@@ -699,7 +699,7 @@ class NotifyAprs(NotifyBase):
 
         Targets or end points should never be identified here.
         """
-        return (self.user, self.password, self.locale)
+        pass
 
     def __len__(self):
         """Returns the number of targets associated with this notification."""
